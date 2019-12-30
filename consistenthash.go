@@ -21,22 +21,27 @@ type ConsistentHash struct {
 //NewMD5Hash ...
 func NewMD5Hash(replicas int32, nodes []string) *ConsistentHash {
 	c := make(map[*big.Int]string)
-	ch := ConsistentHash{
-		circle:   c,
-		hasher:   &MD5Hasher{},
-		replicas: InitializeMin(replicas, 100),
-		nodes:    nodes,
-	}
-	initializeCircle(ch.circle, ch.nodes, ch.replicas)
-	ch.sortedKeys = make([]*big.Int, 0, len(ch.circle))
-	for k := range ch.circle {
-		ch.sortedKeys = append(ch.sortedKeys, k)
+	rep := InitializeMin(replicas, 100)
+	initializeCircle(c, nodes, rep)
+	sortedKeys := make([]*big.Int, 0, len(c))
+	for k := range c {
+		sortedKeys = append(sortedKeys, k)
 	}
 	//Sort the keys in Ascending Order
-	sort.Slice(ch.sortedKeys,
+	sort.Slice(sortedKeys,
 		func(i, j int) bool {
-			return ch.sortedKeys[i].Cmp(ch.sortedKeys[j]) == -1
+			return sortedKeys[i].Cmp(sortedKeys[j]) == -1
 		})
+
+	//Now construct the struct and expose it
+	ch := ConsistentHash{
+		circle:     c,
+		sortedKeys: sortedKeys,
+		replicas:   rep,
+		nodes:      nodes,
+		hasher:     &MD5Hasher{},
+	}
+
 	return &ch
 }
 

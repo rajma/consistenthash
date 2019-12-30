@@ -1,7 +1,6 @@
 package consistenthash
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +16,6 @@ func TestGetShard(t *testing.T) {
 		shard := ch.GetShard(user)
 		actual = append(actual, shard)
 	}
-	fmt.Println("Actual:", actual)
 	assert.Equal(t, actual, expected, "The two slices should be the same.")
 
 }
